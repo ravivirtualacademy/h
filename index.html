@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ravi Virtual Academy</title>
+    <style>
+        /* Basic Setup and Theming */
+        :root {
+            --blue: #007bff;
+            --pink: #ff69b4;
+            --yellow: #ffc107;
+            --dark-bg: #1a1a2e;
+            --light-bg: #f8f9fa;
+            --text-dark: #e0e0e0;
+            --text-light: #333;
+            --card-bg: #1e1e3f;
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--dark-bg);
+            color: var(--text-dark);
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .mobile-frame {
+            width: 100%;
+            height: 100%;
+            max-width: 450px;
+            max-height: 900px;
+            background: var(--dark-bg);
+            border-radius: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Page containers */
+        .page {
+            display: none;
+            flex-direction: column;
+            overflow-y: auto;
+            height: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        .page.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Common elements */
+        h1, h2, h3 {
+            color: var(--pink);
+            text-align: center;
+        }
+
+        .logo {
+            width: 100px;
+            height: 100px;
+            display: block;
+            margin: 10px auto;
+            border-radius: 50%;
+            border: 3px solid var(--yellow);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--yellow);
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-dark);
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--pink);
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, var(--blue), var(--pink));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .btn-secondary {
+             background: var(--card-bg);
+             border: 1px solid var(--yellow);
+        }
+
+        .link {
+            color: var(--yellow);
+            cursor: pointer;
+            text-align: center;
+            display: block;
+            margin-top: 20px;
+        }
+
+        /* Specific Page Styles */
+        #homePage .welcome-text {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .about-section {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+        
+        #enrollmentFormContainer h2 {
+            margin-bottom: 20px;
+        }
+
+        #medium-selection {
+            display: none;
+        }
+        
+        /* Dashboard */
+        #dashboardPage {
+            padding-bottom: 80px; /* Space for nav bar */
+        }
+
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .dashboard-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 5px solid var(--blue);
+        }
+
+        .dashboard-card h3 {
+            color: var(--yellow);
+            margin-top: 0;
+            text-align: left;
+        }
+
+        .fee-status {
+            font-weight: bold;
+        }
+        .fee-status.paid {
+            color: #28a745;
+        }
+        .fee-status.unpaid {
+            color: #dc3545;
+        }
+
+        /* Bottom Nav Bar */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--card-bg);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            border-top: 1px solid var(--border-color);
+            border-bottom-left-radius: 30px;
+            border-bottom-right-radius: 30px;
+        }
+
+        .nav-item {
+            cursor: pointer;
+            text-align: center;
+            color: var(--text-dark);
+            opacity: 0.7;
+        }
+
+        .nav-item.active {
+            color: var(--pink);
+            opacity: 1;
+        }
+        
+        /* Chat styles */
+        #chatPage .chat-window {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 10px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+        #chatPage .message-input-area {
+            display: flex;
+        }
+        #chatPage input {
+            flex-grow: 1;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="mobile-frame">
+        <!-- Home Page -->
+        <div id="homePage" class="page active">
+            <img src="logo.png" alt="Ravi Virtual Academy Logo" class="logo">
+            <div class="welcome-text">
+                <h1>Welcome to Ravi Virtual Academy</h1>
+                <p>Your future, our mission. Excellence in education, delivered online.</p>
+            </div>
+
+            <div class="about-section">
+                <h2>About Us</h2>
+                <p>Ravi Virtual Academy is a premier online learning platform dedicated to providing top-tier education for students in Matriculation and F.Sc. Our state-of-the-art virtual classrooms, experienced faculty, and personalized approach ensure that every student achieves their full academic potential. We believe in making quality education accessible, engaging, and effective.</p>
+            </div>
+            
+            <button id="enrollNowBtn" class="btn">Enroll Now</button>
+            <p class="link" id="loginLink">Already have an account? Login</p>
+        </div>
+
+        <!-- Enrollment Form Page -->
+        <div id="enrollmentPage" class="page">
+             <img src="logo.png" alt="Logo" class="logo">
+             <h2>Enrollment Form</h2>
+             <form id="enrollmentForm">
+                <div class="form-group">
+                    <label for="studentName">Name</label>
+                    <input type="text" id="studentName" required>
+                </div>
+                <div class="form-group">
+                    <label for="fatherName">Father's Name</label>
+                    <input type="text" id="fatherName" required>
+                </div>
+                <div class="form-group">
+                    <label for="contact">Phone Number or Email</label>
+                    <input type="text" id="contact" required>
+                </div>
+                <div class="form-group">
+                    <label for="address">Address</label>
+                    <input type="text" id="address" required>
+                </div>
+                <div class="form-group">
+                    <label for="program">Program</label>
+                    <select id="program" required>
+                        <option value="">Select a Program</option>
+                        <option value="9th">9th Grade</option>
+                        <option value="10th">10th Grade</option>
+                        <option value="1st Year Pre-Medical">1st Year Pre-Medical</option>
+                        <option value="1st Year Pre-Engineering">1st Year Pre-Engineering</option>
+                        <option value="2nd Year Pre-Medical">2nd Year Pre-Medical</option>
+                        <option value="2nd Year Pre-Engineering">2nd Year Pre-Engineering</option>
+                    </select>
+                </div>
+                <div id="medium-selection" class="form-group">
+                    <label for="medium">Medium</label>
+                    <select id="medium">
+                        <option value="English Medium">English Medium</option>
+                        <option value="Urdu Medium">Urdu Medium</option>
+                    </select>
+                </div>
+                 <div class="form-group">
+                     <p>Course Fee: <strong>$50 USD / 13,950 PKR</strong></p>
+                 </div>
+                <div class="form-group">
+                    <label for="discount">Discount Code (Optional)</label>
+                    <input type="text" id="discount">
+                </div>
+                <div class="form-group">
+                    <label for="password">Create Password</label>
+                    <input type="password" id="password" required>
+                </div>
+                <div class="form-group">
+                    <input type="checkbox" id="freeDemo">
+                    <label for="freeDemo">Book a 3-Day Free Demo Class</label>
+                </div>
+                <button type="submit" class="btn">Submit Enrollment</button>
+                <p class="link" id="backToHomeFromEnroll">Back to Home</p>
+             </form>
+        </div>
+
+        <!-- Login Page -->
+        <div id="loginPage" class="page">
+            <img src="logo.png" alt="Logo" class="logo">
+            <h2>Student Login</h2>
+            <form id="loginForm">
+                 <div class="form-group">
+                    <label for="loginContact">Phone Number or Email</label>
+                    <input type="text" id="loginContact" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit" class="btn">Login</button>
+                <p class="link" id="backToHomeFromLogin">Back to Home</p>
+            </form>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div id="dashboardContainer" style="display: none; flex-direction: column; height: 100%;">
+            <div id="dashboardPage" class="page">
+                <div class="dashboard-header">
+                    <h2 id="welcomeStudent">Welcome, [Student]!</h2>
+                </div>
+
+                <div class="dashboard-card">
+                    <h3>Fee Status</h3>
+                    <p>Current Status: <span id="feeStatus" class="fee-status"></span></p>
+                    <p>Amount: <span id="feeAmount"></span></p>
+                </div>
+
+                <div class="dashboard-card">
+                    <h3>Teacher's Comments</h3>
+                    <p id="teacherComments">No comments yet.</p>
+                </div>
+                
+                 <div class="dashboard-card">
+                    <h3>My Timetable</h3>
+                    <pre id="timetableContent">Timetable is not updated yet.</pre>
+                </div>
+            </div>
+            
+            <div id="chatPage" class="page">
+                <h2>Chat with Admin</h2>
+                <div class="chat-window" id="chatWindow">
+                    <!-- Messages will be appended here -->
+                </div>
+                <div class="message-input-area">
+                    <input type="text" id="chatMessageInput" placeholder="Type a message...">
+                    <button id="sendMessageBtn" class="btn" style="width: auto; padding: 12px;">Send</button>
+                </div>
+            </div>
+            
+            <div id="settingsPage" class="page">
+                <h2>Settings</h2>
+                 <div class="dashboard-card">
+                    <h3>Theme</h3>
+                    <button id="toggleThemeBtn" class="btn btn-secondary">Switch to Light Mode</button>
+                </div>
+                <div class="dashboard-card">
+                    <h3>Send Feedback to Developer</h3>
+                    <textarea id="devFeedback" style="width: 100%; height: 80px; background: var(--card-bg); color: white; border-radius: 8px; padding: 10px;"></textarea>
+                    <button id="sendFeedbackBtn" class="btn btn-secondary" style="margin-top: 10px;">Send Feedback</button>
+                </div>
+                 <button id="logoutBtn" class="btn">Logout</button>
+            </div>
+
+            <div class="bottom-nav">
+                <div class="nav-item active" data-page="dashboardPage">Dashboard</div>
+                <div class="nav-item" data-page="chatPage">Chat</div>
+                <div class="nav-item" data-page="settingsPage">Settings</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+    <script>
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyB7RqRuStzh6bC5_SF9chcThtH_0oaZ-8g",
+            authDomain: "chatty-2b88b.firebaseapp.com",
+            databaseURL: "https://chatty-2b88b-default-rtdb.firebaseio.com",
+            projectId: "chatty-2b88b",
+            storageBucket: "chatty-2b88b.firebasestorage.app",
+            messagingSenderId: "381256217090",
+            appId: "1:381256217090:web:4d705d205a3f0e16cbed1b"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // --- DOM Elements ---
+        const pages = document.querySelectorAll('.page');
+        const homePage = document.getElementById('homePage');
+        const enrollmentPage = document.getElementById('enrollmentPage');
+        const loginPage = document.getElementById('loginPage');
+        const dashboardContainer = document.getElementById('dashboardContainer');
+
+        const enrollNowBtn = document.getElementById('enrollNowBtn');
+        const loginLink = document.getElementById('loginLink');
+        const backToHomeFromEnroll = document.getElementById('backToHomeFromEnroll');
+        const backToHomeFromLogin = document.getElementById('backToHomeFromLogin');
+
+        const enrollmentForm = document.getElementById('enrollmentForm');
+        const loginForm = document.getElementById('loginForm');
+        
+        const programSelect = document.getElementById('program');
+        const mediumSelectionDiv = document.getElementById('medium-selection');
+        
+        const navItems = document.querySelectorAll('.nav-item');
+
+        // --- Page Navigation ---
+        function showPage(pageId) {
+            if (pageId.startsWith('dashboard') || pageId.startsWith('chat') || pageId.startsWith('settings')) {
+                homePage.style.display = 'none';
+                enrollmentPage.style.display = 'none';
+                loginPage.style.display = 'none';
+                dashboardContainer.style.display = 'flex';
+
+                document.querySelectorAll('#dashboardContainer .page').forEach(p => p.classList.remove('active'));
+                document.getElementById(pageId).classList.add('active');
+
+                navItems.forEach(item => {
+                    item.classList.toggle('active', item.dataset.page === pageId);
+                });
+            } else {
+                 dashboardContainer.style.display = 'none';
+                 pages.forEach(p => p.classList.remove('active'));
+                 document.getElementById(pageId).classList.add('active');
+            }
+        }
+        
+        enrollNowBtn.addEventListener('click', () => showPage('enrollmentPage'));
+        loginLink.addEventListener('click', () => showPage('loginPage'));
+        backToHomeFromEnroll.addEventListener('click', () => showPage('homePage'));
+        backToHomeFromLogin.addEventListener('click', () => showPage('homePage'));
+
+        // --- Enrollment Logic ---
+        programSelect.addEventListener('change', (e) => {
+            if (e.target.value === '9th' || e.target.value === '10th') {
+                mediumSelectionDiv.style.display = 'block';
+            } else {
+                mediumSelectionDiv.style.display = 'none';
+            }
+        });
+
+        enrollmentForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const studentName = document.getElementById('studentName').value;
+            const contact = document.getElementById('contact').value;
+            
+            // Sanitize contact to use as a key
+            const studentId = contact.replace(/[.#$[\]]/g, "_");
+
+            const studentData = {
+                name: studentName,
+                fatherName: document.getElementById('fatherName').value,
+                contact: contact,
+                address: document.getElementById('address').value,
+                program: document.getElementById('program').value,
+                medium: document.getElementById('medium').value,
+                password: document.getElementById('password').value,
+                discountCode: document.getElementById('discount').value,
+                demoRequest: document.getElementById('freeDemo').checked,
+                enrollmentDate: new Date().toISOString(),
+                fee: {
+                    status: 'unpaid',
+                    amount: '50 USD'
+                },
+                teacherComments: "Welcome to the academy!",
+                timetable: "Your schedule is being prepared."
+            };
+
+            database.ref('students/' + studentId).set(studentData)
+                .then(() => {
+                    alert('Enrollment successful! Please login to access your dashboard.');
+                    enrollmentForm.reset();
+                    showPage('loginPage');
+                })
+                .catch(error => {
+                    alert('Error: ' + error.message);
+                });
+        });
+        
+        // --- Login Logic ---
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const contact = document.getElementById('loginContact').value;
+            const password = document.getElementById('loginPassword').value;
+            const studentId = contact.replace(/[.#$[\]]/g, "_");
+
+            database.ref('students/' + studentId).once('value', (snapshot) => {
+                if (snapshot.exists()) {
+                    const studentData = snapshot.val();
+                    if (studentData.password === password) {
+                        localStorage.setItem('studentId', studentId);
+                        loadDashboard(studentData);
+                        showPage('dashboardPage');
+                    } else {
+                        alert('Incorrect password!');
+                    }
+                } else {
+                    alert('No account found with this contact information.');
+                }
+            }).catch(error => alert('Login Error: ' + error.message));
+        });
+        
+        // --- Dashboard Logic ---
+        function loadDashboard(data) {
+            document.getElementById('welcomeStudent').innerText = `Welcome, ${data.name}!`;
+            const feeStatusEl = document.getElementById('feeStatus');
+            feeStatusEl.innerText = data.fee.status;
+            feeStatusEl.className = `fee-status ${data.fee.status}`;
+            document.getElementById('feeAmount').innerText = data.fee.amount;
+            document.getElementById('teacherComments').innerText = data.teacherComments;
+            document.getElementById('timetableContent').innerText = data.timetable;
+            
+            loadChatMessages();
+        }
+
+        // --- Bottom Navigation Logic ---
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                showPage(item.dataset.page);
+            });
+        });
+        
+        // --- Chat Logic ---
+        const chatWindow = document.getElementById('chatWindow');
+        const chatMessageInput = document.getElementById('chatMessageInput');
+        const sendMessageBtn = document.getElementById('sendMessageBtn');
+        let chatRef;
+
+        function loadChatMessages() {
+            const studentId = localStorage.getItem('studentId');
+            if (!studentId) return;
+
+            chatRef = database.ref(`chats/${studentId}`);
+            chatRef.on('child_added', (snapshot) => {
+                const message = snapshot.val();
+                const messageEl = document.createElement('div');
+                messageEl.style.marginBottom = '10px';
+                messageEl.style.padding = '8px 12px';
+                messageEl.style.borderRadius = '15px';
+                messageEl.textContent = message.text;
+
+                if (message.sender === 'student') {
+                    messageEl.style.background = 'var(--blue)';
+                    messageEl.style.color = 'white';
+                    messageEl.style.marginLeft = 'auto';
+                    messageEl.style.borderBottomRightRadius = '0';
+                } else {
+                    messageEl.style.background = 'var(--card-bg)';
+                    messageEl.style.color = 'var(--text-dark)';
+                    messageEl.style.marginRight = 'auto';
+                    messageEl.style.borderBottomLeftRadius = '0';
+                }
+                chatWindow.appendChild(messageEl);
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+            });
+        }
+
+        sendMessageBtn.addEventListener('click', () => {
+            const studentId = localStorage.getItem('studentId');
+            const messageText = chatMessageInput.value;
+            if (!messageText.trim() || !studentId) return;
+
+            const message = {
+                sender: 'student',
+                text: messageText,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            };
+            chatRef.push(message);
+            chatMessageInput.value = '';
+        });
+        
+        // --- Settings Logic ---
+        const toggleThemeBtn = document.getElementById('toggleThemeBtn');
+        toggleThemeBtn.addEventListener('click', () => {
+             document.body.classList.toggle('light-mode');
+             const isLight = document.body.classList.contains('light-mode');
+             if(isLight) {
+                 document.documentElement.style.setProperty('--dark-bg', '#f8f9fa');
+                 document.documentElement.style.setProperty('--text-dark', '#333');
+                 document.documentElement.style.setProperty('--card-bg', '#ffffff');
+                 document.documentElement.style.setProperty('--border-color', 'rgba(0, 0, 0, 0.1)');
+                 toggleThemeBtn.textContent = 'Switch to Dark Mode';
+             } else {
+                 document.documentElement.style.setProperty('--dark-bg', '#1a1a2e');
+                 document.documentElement.style.setProperty('--text-dark', '#e0e0e0');
+                 document.documentElement.style.setProperty('--card-bg', '#1e1e3f');
+                 document.documentElement.style.setProperty('--border-color', 'rgba(255, 255, 255, 0.1)');
+                 toggleThemeBtn.textContent = 'Switch to Light Mode';
+             }
+        });
+        
+        const sendFeedbackBtn = document.getElementById('sendFeedbackBtn');
+        sendFeedbackBtn.addEventListener('click', () => {
+            const feedbackText = document.getElementById('devFeedback').value;
+            if(!feedbackText.trim()) return;
+            
+            database.ref('developer_feedback').push({
+                studentId: localStorage.getItem('studentId'),
+                feedback: feedbackText,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            }).then(() => {
+                alert('Feedback sent. Thank you!');
+                document.getElementById('devFeedback').value = '';
+            }).catch(error => alert('Error: ' + error.message));
+        });
+        
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('studentId');
+            if(chatRef) chatRef.off(); // Detach listener
+            showPage('homePage');
+        });
+        
+        // Check if user is already logged in
+        window.addEventListener('load', () => {
+            const studentId = localStorage.getItem('studentId');
+            if (studentId) {
+                 database.ref('students/' + studentId).once('value', (snapshot) => {
+                    if (snapshot.exists()) {
+                        loadDashboard(snapshot.val());
+                        showPage('dashboardPage');
+                    } else {
+                        localStorage.removeItem('studentId'); // Clean up invalid ID
+                    }
+                 });
+            }
+        });
+
+    </script>
+</body>
+</html>
